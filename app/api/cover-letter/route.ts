@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { gemini } from "@/lib/gemini/client";
 import { coverLetterRequestSchema } from "@/lib/cover-letter/schema";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const SYSTEM_PROMPT =
   "You write concise, compelling cover letters tailored to a specific job " +
@@ -13,6 +14,17 @@ const SYSTEM_PROMPT =
   "salutation — no letterhead, date, address block, or commentary.";
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in a few minutes." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();

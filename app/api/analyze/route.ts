@@ -7,6 +7,7 @@ import {
   jobAnalysisSchema,
   jobDescriptionFormSchema,
 } from "@/lib/job-analysis/schema";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const SYSTEM_PROMPT =
   "You extract structured information from job descriptions. Only use " +
@@ -17,6 +18,17 @@ const SYSTEM_PROMPT =
 const jobAnalysisJsonSchema = z.toJSONSchema(jobAnalysisSchema);
 
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(getClientIp(request));
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in a few minutes." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();

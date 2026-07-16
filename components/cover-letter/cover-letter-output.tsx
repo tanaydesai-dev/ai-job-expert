@@ -14,11 +14,13 @@ import {
 interface CoverLetterOutputProps {
   text: string;
   isStreaming: boolean;
+  fileName?: string;
 }
 
 export function CoverLetterOutput({
   text,
   isStreaming,
+  fileName = "cover-letter.txt",
 }: CoverLetterOutputProps) {
   const [copied, setCopied] = useState(false);
 
@@ -33,7 +35,7 @@ export function CoverLetterOutput({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "cover-letter.txt";
+    link.download = fileName;
     link.click();
     URL.revokeObjectURL(url);
   }

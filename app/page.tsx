@@ -24,6 +24,13 @@ function extractErrorMessage(data: unknown, fallback: string): string {
     : fallback;
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function Home() {
   const [jobDescription, setJobDescription] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -152,6 +159,11 @@ export default function Home() {
         <CoverLetterOutput
           text={coverLetterText}
           isStreaming={isGeneratingCoverLetter}
+          fileName={
+            analysis?.title
+              ? `cover-letter-${slugify(analysis.title)}.txt`
+              : undefined
+          }
         />
       )}
     </div>

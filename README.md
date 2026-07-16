@@ -107,7 +107,9 @@ npm run dev
 
 ## Status
 
-Phase 4 complete — `/api/cover-letter` streams a tailored cover letter from
-Gemini (name/background/tone form → streamed text via `ReadableStream`,
-rendered live with a blinking cursor, copy/download once done). Verified
-end-to-end with a real API key.
+Phase 5 complete — both API routes are rate-limited (10 requests / 5 min per
+IP, shared budget across `/api/analyze` and `/api/cover-letter`, in-memory —
+see `lib/rate-limit.ts` for the scaling caveat), a global error boundary
+(`app/error.tsx`) catches unhandled render errors, the cover letter download
+filename now uses the job title, and the layout was verified overflow-free
+at 375px mobile width.
