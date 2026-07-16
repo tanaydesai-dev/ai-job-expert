@@ -33,6 +33,17 @@ API key is never exposed to the browser.
 v1 is intentionally stateless — no database or auth. Persistence/accounts are a
 later, optional phase.
 
+## Folder conventions
+
+- `app/api/<feature>/route.ts` — one folder per feature's API route (e.g.
+  `app/api/analyze/`, `app/api/cover-letter/`)
+- `components/ui/` — shadcn/ui primitives only (managed by `npx shadcn add`)
+- `components/<feature>/` — feature-specific components (e.g.
+  `components/job-analysis/`, `components/cover-letter/`)
+- `lib/<feature>/` — feature-specific server logic, e.g. `lib/anthropic/`
+  (Claude client, prompts, schemas). `lib/utils.ts` stays flat — it's the
+  shadcn-generated `cn()` helper that generated components import directly.
+
 ## Phases
 
 ### Phase 0 — Scaffolding
@@ -82,6 +93,15 @@ later, optional phase.
 ### Phase 7 — Deploy
 - Push to GitHub, deploy on Vercel, configure environment variables there
 
+## Getting started
+
+```bash
+npm install
+cp .env.local.example .env.local   # then fill in ANTHROPIC_API_KEY
+npm run dev
+```
+
 ## Status
 
-Project scaffolding in progress.
+Phase 0 complete — Next.js + TypeScript + Tailwind + shadcn/ui scaffolded,
+core dependencies installed, project builds and runs.
