@@ -52,7 +52,7 @@ export function JobAnalysisResult({
 
   return (
     <Card className={cn("w-full max-w-2xl overflow-hidden py-0", className)}>
-      <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-primary/20" />
+      <div className="h-1 w-full bg-gradient-to-r from-primary via-fuchsia-500 to-primary/30" />
       <CardHeader className="pt-5">
         <CardTitle className="text-xl">
           {analysis.title ?? "Job summary"}

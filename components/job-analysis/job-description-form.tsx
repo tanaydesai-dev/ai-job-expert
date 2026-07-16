@@ -75,7 +75,7 @@ export function JobDescriptionForm({
             ) : (
               <Sparkles />
             )}
-            {isSubmitting ? "Analyzing..." : "Analyze"}
+            {isSubmitting ? "Reading between the lines..." : "Analyze"}
           </Button>
         </CardFooter>
       </form>

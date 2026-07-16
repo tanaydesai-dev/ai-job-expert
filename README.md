@@ -120,3 +120,26 @@ gradient-glow hero, two-tone logotype, icon-led meta grid and buttons
 (`lucide-react`), soft card shadows, and entrance animations
 (`tw-animate-css`). "Modern tech/SaaS" direction, chosen and verified via
 screenshots at desktop and 375px mobile.
+
+**Round 2 — dark mode + personality:** along the way, found and fixed a real
+bug — `--font-sans` was circularly self-referenced in `globals.css`, so the
+Geist font loaded via `next/font` was never actually applied; the whole app
+had been rendering in the browser's fallback system font. Fixed that, added
+Space Grotesk (`--font-heading`) for headings, and added:
+- **Dark mode** — `next-themes` (`components/theme-provider.tsx`,
+  `components/theme-toggle.tsx`), system-aware with a manual toggle, no
+  hydration flash (both icons always render; pure CSS `dark:` variants
+  crossfade them — a `useEffect`-based "mounted" gate was tried first but
+  flagged by this repo's `react-hooks/set-state-in-effect` lint rule)
+- **Site header** (`components/site-header.tsx`) — sticky, gradient logo
+  mark + wordmark + theme toggle
+- **Dual-tone indigo→fuchsia** gradient (hero glow, gradient title text,
+  card accent bars) instead of a single flat accent color
+- **Dot-grid background texture**, theme-aware via a `--grid-dot` token
+- **Branded favicon** (`app/icon.tsx`, generated with `next/og`)
+- Punchier microcopy ("Job postings, decoded", personality-infused loading
+  states)
+
+Verified with real browser screenshots across light mode, dark mode
+(including the toggle transition), and 375px mobile — all states, zero
+console errors, zero layout overflow.

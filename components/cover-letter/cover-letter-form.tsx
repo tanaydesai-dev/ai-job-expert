@@ -134,7 +134,7 @@ export function CoverLetterForm({
             ) : (
               <Sparkles />
             )}
-            {isSubmitting ? "Generating..." : "Generate cover letter"}
+            {isSubmitting ? "Writing your pitch..." : "Generate cover letter"}
           </Button>
         </CardFooter>
       </form>

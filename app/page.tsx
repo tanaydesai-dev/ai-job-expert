@@ -131,22 +131,26 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-6 px-4 py-16 sm:py-20">
+    <div className="flex min-h-screen flex-col items-center gap-6 px-4 py-12 sm:py-16">
       <div className="relative flex flex-col items-center text-center">
         <div
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl"
+          className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-1/3 left-2/3 -z-10 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-500/15 blur-3xl"
         />
         <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
           <Sparkles className="size-3.5" />
           AI-powered
         </div>
         <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-          <span className="text-primary">ai</span>-job-expert
+          Job postings, <span className="bg-gradient-to-r from-primary to-fuchsia-500 bg-clip-text text-transparent">decoded</span>.
         </h1>
         <p className="mt-3 max-w-md text-muted-foreground">
-          Paste a job description to get a structured summary and a tailored
-          cover letter.
+          Paste any job posting. Get the real requirements at a glance and a
+          cover letter that actually sounds like you.
         </p>
       </div>
 
