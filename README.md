@@ -113,3 +113,10 @@ see `lib/rate-limit.ts` for the scaling caveat), a global error boundary
 (`app/error.tsx`) catches unhandled render errors, the cover letter download
 filename now uses the job title, and the layout was verified overflow-free
 at 375px mobile width.
+
+**Visual design pass:** reskinned from the default grayscale shadcn theme to
+an indigo accent (`--primary` and friends in `app/globals.css`), with a
+gradient-glow hero, two-tone logotype, icon-led meta grid and buttons
+(`lucide-react`), soft card shadows, and entrance animations
+(`tw-animate-css`). "Modern tech/SaaS" direction, chosen and verified via
+screenshots at desktop and 375px mobile.

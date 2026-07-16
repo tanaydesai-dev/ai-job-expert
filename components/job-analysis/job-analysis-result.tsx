@@ -1,3 +1,11 @@
+import {
+  Briefcase,
+  Building2,
+  DollarSign,
+  MapPin,
+  type LucideIcon,
+} from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -5,10 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { JobAnalysis } from "@/lib/job-analysis/schema";
 
 interface JobAnalysisResultProps {
   analysis: JobAnalysis;
+  className?: string;
 }
 
 const WORK_MODE_LABELS: Record<JobAnalysis["workMode"], string | null> = {
@@ -18,19 +28,32 @@ const WORK_MODE_LABELS: Record<JobAnalysis["workMode"], string | null> = {
   unspecified: null,
 };
 
-export function JobAnalysisResult({ analysis }: JobAnalysisResultProps) {
-  const metaItems = [
-    { label: "Location", value: analysis.location },
-    { label: "Work mode", value: WORK_MODE_LABELS[analysis.workMode] },
-    { label: "Experience", value: analysis.experienceRequired },
-    { label: "Salary range", value: analysis.salaryRange },
+export function JobAnalysisResult({
+  analysis,
+  className,
+}: JobAnalysisResultProps) {
+  const metaItems: { label: string; value: string; icon: LucideIcon }[] = [
+    { label: "Location", value: analysis.location, icon: MapPin },
+    {
+      label: "Work mode",
+      value: WORK_MODE_LABELS[analysis.workMode],
+      icon: Building2,
+    },
+    {
+      label: "Experience",
+      value: analysis.experienceRequired,
+      icon: Briefcase,
+    },
+    { label: "Salary range", value: analysis.salaryRange, icon: DollarSign },
   ].filter(
-    (item): item is { label: string; value: string } => item.value !== null,
+    (item): item is { label: string; value: string; icon: LucideIcon } =>
+      item.value !== null,
   );
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
+    <Card className={cn("w-full max-w-2xl overflow-hidden py-0", className)}>
+      <div className="h-1 w-full bg-gradient-to-r from-primary via-primary/60 to-primary/20" />
+      <CardHeader className="pt-5">
         <CardTitle className="text-xl">
           {analysis.title ?? "Job summary"}
         </CardTitle>
@@ -38,15 +61,18 @@ export function JobAnalysisResult({ analysis }: JobAnalysisResultProps) {
           <p className="text-sm text-muted-foreground">{analysis.company}</p>
         )}
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pb-5">
         {metaItems.length > 0 && (
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {metaItems.map((item) => (
-              <div key={item.label}>
-                <dt className="text-xs font-medium text-muted-foreground">
-                  {item.label}
-                </dt>
-                <dd className="text-sm">{item.value}</dd>
+              <div key={item.label} className="flex items-start gap-2">
+                <item.icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                <div>
+                  <dt className="text-xs font-medium text-muted-foreground">
+                    {item.label}
+                  </dt>
+                  <dd className="text-sm">{item.value}</dd>
+                </div>
               </div>
             ))}
           </dl>

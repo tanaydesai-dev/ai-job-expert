@@ -1,5 +1,6 @@
 "use client";
 
+import { CircleAlert, Sparkles } from "lucide-react";
 import { useState } from "react";
 
 import { CoverLetterForm } from "@/components/cover-letter/cover-letter-form";
@@ -29,6 +30,15 @@ function slugify(text: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function ErrorMessage({ message }: { message: string }) {
+  return (
+    <div className="flex w-full max-w-2xl animate-in items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-sm text-destructive fade-in-0 slide-in-from-top-1">
+      <CircleAlert className="mt-0.5 size-4 shrink-0" />
+      <span>{message}</span>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -121,12 +131,20 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-6 px-4 py-16">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          ai-job-expert
+    <div className="flex min-h-screen flex-col items-center gap-6 px-4 py-16 sm:py-20">
+      <div className="relative flex flex-col items-center text-center">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl"
+        />
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+          <Sparkles className="size-3.5" />
+          AI-powered
+        </div>
+        <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+          <span className="text-primary">ai</span>-job-expert
         </h1>
-        <p className="mt-2 max-w-md text-muted-foreground">
+        <p className="mt-3 max-w-md text-muted-foreground">
           Paste a job description to get a structured summary and a tailored
           cover letter.
         </p>
@@ -135,11 +153,21 @@ export default function Home() {
       <JobDescriptionForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
 
       {isSubmitting && <JobAnalysisSkeleton />}
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      {!isSubmitting && analysis && <JobAnalysisResult analysis={analysis} />}
+      {error && <ErrorMessage message={error} />}
+      {!isSubmitting && analysis && (
+        <JobAnalysisResult
+          analysis={analysis}
+          className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500"
+        />
+      )}
 
       {!isSubmitting && analysis && !showCoverLetterForm && !coverLetterText && (
-        <Button onClick={() => setShowCoverLetterForm(true)}>
+        <Button
+          size="lg"
+          onClick={() => setShowCoverLetterForm(true)}
+          className="animate-in fade-in-0 slide-in-from-bottom-2 duration-500"
+        >
+          <Sparkles />
           Generate cover letter
         </Button>
       )}
@@ -151,9 +179,7 @@ export default function Home() {
         />
       )}
 
-      {coverLetterError && (
-        <p className="text-sm text-destructive">{coverLetterError}</p>
-      )}
+      {coverLetterError && <ErrorMessage message={coverLetterError} />}
 
       {(coverLetterText || isGeneratingCoverLetter) && (
         <CoverLetterOutput
@@ -164,6 +190,7 @@ export default function Home() {
               ? `cover-letter-${slugify(analysis.title)}.txt`
               : undefined
           }
+          className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500"
         />
       )}
     </div>

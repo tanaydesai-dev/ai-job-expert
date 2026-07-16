@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Sparkles } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,17 @@ export function CoverLetterForm({
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" disabled={isSubmitting} className="ml-auto">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isSubmitting}
+            className="ml-auto"
+          >
+            {isSubmitting ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Sparkles />
+            )}
             {isSubmitting ? "Generating..." : "Generate cover letter"}
           </Button>
         </CardFooter>

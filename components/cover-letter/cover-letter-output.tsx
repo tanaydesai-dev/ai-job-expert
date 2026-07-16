@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Copy, Download, Mail } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,17 +11,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface CoverLetterOutputProps {
   text: string;
   isStreaming: boolean;
   fileName?: string;
+  className?: string;
 }
 
 export function CoverLetterOutput({
   text,
   isStreaming,
   fileName = "cover-letter.txt",
+  className,
 }: CoverLetterOutputProps) {
   const [copied, setCopied] = useState(false);
 
@@ -41,24 +45,33 @@ export function CoverLetterOutput({
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className={cn("w-full max-w-2xl", className)}>
       <CardHeader>
-        <CardTitle>Your cover letter</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="size-4 text-primary" />
+          Your cover letter
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm whitespace-pre-wrap">
           {text}
           {isStreaming && (
-            <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-foreground align-text-bottom" />
+            <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-primary align-text-bottom" />
           )}
         </p>
       </CardContent>
       {!isStreaming && text && (
         <CardFooter className="gap-2">
           <Button variant="outline" size="sm" onClick={handleCopy}>
+            {copied ? (
+              <Check className="text-primary" />
+            ) : (
+              <Copy />
+            )}
             {copied ? "Copied!" : "Copy"}
           </Button>
           <Button variant="outline" size="sm" onClick={handleDownload}>
+            <Download />
             Download
           </Button>
         </CardFooter>
