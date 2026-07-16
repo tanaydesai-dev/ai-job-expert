@@ -105,6 +105,7 @@ npm run dev
 
 ## Status
 
-Phase 2 complete — `/api/analyze` extracts structured job data via Gemini
-(`gemini-flash-lite-latest`, structured JSON output, bounded timeout/retries).
-Verified end-to-end with a real API key.
+Phase 3 complete — the analysis result renders as a card (title, company,
+location/work mode/experience/salary, summary, skills as tags), with a
+matching loading skeleton and inline error messages sourced from the API
+response.

@@ -2,16 +2,24 @@
 
 import { useState } from "react";
 
+import { JobAnalysisResult } from "@/components/job-analysis/job-analysis-result";
+import { JobAnalysisSkeleton } from "@/components/job-analysis/job-analysis-skeleton";
 import { JobDescriptionForm } from "@/components/job-analysis/job-description-form";
-import type { JobDescriptionFormValues } from "@/lib/job-analysis/schema";
+import {
+  jobAnalysisSchema,
+  type JobAnalysis,
+  type JobDescriptionFormValues,
+} from "@/lib/job-analysis/schema";
 
 export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<JobAnalysis | null>(null);
 
   async function handleSubmit(values: JobDescriptionFormValues) {
     setIsSubmitting(true);
     setError(null);
+    setAnalysis(null);
 
     try {
       const response = await fetch("/api/analyze", {
@@ -20,13 +28,20 @@ export default function Home() {
         body: JSON.stringify(values),
       });
 
+      const data: unknown = await response.json();
+
       if (!response.ok) {
-        throw new Error("Analysis failed. Please try again.");
+        const message =
+          typeof data === "object" &&
+          data !== null &&
+          "error" in data &&
+          typeof data.error === "string"
+            ? data.error
+            : "Analysis failed. Please try again.";
+        throw new Error(message);
       }
 
-      const data = await response.json();
-      // Phase 3 will render this as a structured summary.
-      console.log("Analysis result:", data);
+      setAnalysis(jobAnalysisSchema.parse(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -49,7 +64,9 @@ export default function Home() {
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
       />
+      {isSubmitting && <JobAnalysisSkeleton />}
       {error && <p className="text-sm text-destructive">{error}</p>}
+      {!isSubmitting && analysis && <JobAnalysisResult analysis={analysis} />}
     </div>
   );
 }
