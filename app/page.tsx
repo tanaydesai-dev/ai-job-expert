@@ -95,10 +95,15 @@ export default function Home() {
     setIsGeneratingCoverLetter(true);
 
     try {
+      const formData = new FormData();
+      formData.set("name", values.name);
+      formData.set("tone", values.tone);
+      formData.set("resume", values.resume);
+      formData.set("jobDescription", jobDescription);
+
       const response = await fetch("/api/cover-letter", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, jobDescription }),
+        body: formData,
       });
 
       if (!response.ok || !response.body) {

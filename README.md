@@ -77,10 +77,11 @@ later, optional phase.
 
 ### Phase 4 — Cover letter generation (on demand)
 - "Generate cover letter" button, enabled once a summary exists
-- A form to capture info about the user (name, background/resume text, tone
+- A form to capture info about the user (name, resume upload, tone
   preference)
-- API route (`/api/cover-letter`) that sends the job description + user
-  background to Gemini, streamed back for responsiveness
+- API route (`/api/cover-letter`) that extracts text from the uploaded resume
+  PDF, sends it with the job description to Gemini, streamed back for
+  responsiveness
 - Streaming text displayed in the UI, with copy/download options
 
 ### Phase 5 — Polish & robustness
@@ -143,3 +144,18 @@ Space Grotesk (`--font-heading`) for headings, and added:
 Verified with real browser screenshots across light mode, dark mode
 (including the toggle transition), and 375px mobile — all states, zero
 console errors, zero layout overflow.
+
+**Resume upload for cover letters:** the cover letter form no longer asks for
+free-typed "background" text — instead the user uploads their resume as a
+PDF. The form now submits as `multipart/form-data`; `/api/cover-letter`
+extracts the resume's text server-side with `pdf-parse` (imported from its
+inner `lib/pdf-parse.js` module rather than the package root, since the root
+`index.js` runs a `require.main`-style debug self-test that Turbopack's
+module bundling triggers on import — confirmed by a failing production
+build before the fix) and feeds that text to Gemini in place of the old
+background field. Validates file type (PDF only) and size (5MB max)
+client- and server-side, and rejects PDFs with too little extractable text
+(e.g. scanned image-only resumes) with a clear error message. Verified with
+a real generated PDF resume run through the full flow via Playwright —
+correct text extraction, correct rejection of non-PDF files, and a
+generated cover letter that accurately cited specifics from the resume.

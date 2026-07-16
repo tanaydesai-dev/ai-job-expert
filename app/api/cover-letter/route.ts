@@ -1,8 +1,14 @@
 import { ApiError } from "@google/genai";
 import { NextResponse } from "next/server";
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
+import { ZodError } from "zod";
 
 import { gemini } from "@/lib/gemini/client";
-import { coverLetterRequestSchema } from "@/lib/cover-letter/schema";
+import {
+  coverLetterRequestFieldsSchema,
+  MAX_RESUME_FILE_SIZE_BYTES,
+  resumeTextSchema,
+} from "@/lib/cover-letter/schema";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const SYSTEM_PROMPT =
@@ -25,27 +31,74 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
+  let formData: FormData;
   try {
-    body = await request.json();
+    formData = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
-
-  const parsedInput = coverLetterRequestSchema.safeParse(body);
-  if (!parsedInput.success) {
     return NextResponse.json(
-      { error: parsedInput.error.issues[0]?.message ?? "Invalid input." },
+      { error: "Invalid form submission." },
       { status: 400 },
     );
   }
 
-  const { jobDescription, name, background, tone } = parsedInput.data;
+  const parsedFields = coverLetterRequestFieldsSchema.safeParse({
+    name: formData.get("name"),
+    tone: formData.get("tone"),
+    jobDescription: formData.get("jobDescription"),
+  });
+  if (!parsedFields.success) {
+    return NextResponse.json(
+      { error: parsedFields.error.issues[0]?.message ?? "Invalid input." },
+      { status: 400 },
+    );
+  }
+
+  const resumeFile = formData.get("resume");
+  if (!(resumeFile instanceof File)) {
+    return NextResponse.json(
+      { error: "Upload your resume as a PDF." },
+      { status: 400 },
+    );
+  }
+  if (resumeFile.type !== "application/pdf") {
+    return NextResponse.json(
+      { error: "Resume must be a PDF file." },
+      { status: 400 },
+    );
+  }
+  if (resumeFile.size > MAX_RESUME_FILE_SIZE_BYTES) {
+    return NextResponse.json(
+      { error: "Resume must be under 5MB." },
+      { status: 400 },
+    );
+  }
+
+  let resumeText: string;
+  try {
+    const resumeBuffer = Buffer.from(await resumeFile.arrayBuffer());
+    const parsedPdf = await pdfParse(resumeBuffer);
+    resumeText = resumeTextSchema.parse(parsedPdf.text);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { error: error.issues[0]?.message ?? "Invalid resume." },
+        { status: 400 },
+      );
+    }
+
+    console.error("Error parsing resume PDF:", error);
+    return NextResponse.json(
+      { error: "Could not read that PDF. Please try a different file." },
+      { status: 400 },
+    );
+  }
+
+  const { jobDescription, name, tone } = parsedFields.data;
 
   const input =
     `Job description:\n${jobDescription}\n\n` +
     `Candidate name: ${name}\n` +
-    `Candidate background: ${background}\n` +
+    `Candidate resume:\n${resumeText}\n\n` +
     `Desired tone: ${tone}\n\n` +
     "Write a cover letter for this candidate applying to this job.";
 
