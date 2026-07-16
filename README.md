@@ -7,8 +7,13 @@ A web app that takes a job description as input and generates:
 ## Architecture
 
 Next.js full-stack app — frontend and backend live in the same project. All
-Claude API calls happen server-side (API routes / Server Actions) so the
+Gemini API calls happen server-side (API routes / Server Actions) so the
 API key is never exposed to the browser.
+
+**Why Gemini:** chosen over Claude for cost — Google AI Studio issues free
+API keys (rate-limited, but sufficient for a project at this scale). If
+usage ever needs a paid tier, the provider is isolated to `lib/gemini/` and
+the two API routes, so swapping is a contained change.
 
 ## Stack
 
@@ -21,9 +26,10 @@ API key is never exposed to the browser.
 
 **Backend**
 - Next.js Route Handlers (`app/api/*/route.ts`) — no separate server
-- `@anthropic-ai/sdk` — official Claude API client, server-side only
-- zod — shared validation for request bodies and Claude's structured JSON output
-- Environment variables via `.env.local` (`ANTHROPIC_API_KEY`)
+- `@google/genai` — official Gemini API client, server-side only
+- zod — shared validation for request bodies, and converted to JSON Schema
+  (`z.toJSONSchema`) for Gemini's structured output
+- Environment variables via `.env.local` (`GEMINI_API_KEY`)
 
 **Infra**
 - Vercel — hosting and deployment
@@ -40,16 +46,16 @@ later, optional phase.
 - `components/ui/` — shadcn/ui primitives only (managed by `npx shadcn add`)
 - `components/<feature>/` — feature-specific components (e.g.
   `components/job-analysis/`, `components/cover-letter/`)
-- `lib/<feature>/` — feature-specific server logic, e.g. `lib/anthropic/`
-  (Claude client, prompts, schemas). `lib/utils.ts` stays flat — it's the
+- `lib/<feature>/` — feature-specific server logic, e.g. `lib/gemini/`
+  (Gemini client, prompts, schemas). `lib/utils.ts` stays flat — it's the
   shadcn-generated `cn()` helper that generated components import directly.
 
 ## Phases
 
 ### Phase 0 — Scaffolding
 - `create-next-app` with TypeScript + Tailwind
-- Install `@anthropic-ai/sdk`, zod, react-hook-form, shadcn/ui
-- Set up `.env.local` for `ANTHROPIC_API_KEY` (never committed)
+- Install `@google/genai`, zod, react-hook-form, shadcn/ui
+- Set up `.env.local` for `GEMINI_API_KEY` (never committed)
 - Basic folder structure (`app/`, `lib/`, `components/`)
 
 ### Phase 1 — Job description input
@@ -58,9 +64,10 @@ later, optional phase.
 - "Analyze" button that submits to the backend
 
 ### Phase 2 — Summary generation (core feature)
-- API route (`/api/analyze`) that sends the job description to Claude
-- Uses structured outputs (`output_config.format` with a JSON schema) so the
-  response is guaranteed valid JSON — no fragile text parsing
+- API route (`/api/analyze`) that sends the job description to Gemini
+- Uses structured outputs (`response_format` with a JSON schema, via the
+  Interactions API) so the response is guaranteed valid JSON — no fragile
+  text parsing
 - Schema fields: title, company, location, work mode (remote/hybrid/onsite),
   required years of experience, required skills, nice-to-haves, salary range
   (if present), key responsibilities summary
@@ -76,7 +83,7 @@ later, optional phase.
 - A form to capture info about the user (name, background/resume text, tone
   preference)
 - API route (`/api/cover-letter`) that sends the job description + user
-  background to Claude, streamed back for responsiveness
+  background to Gemini, streamed back for responsiveness
 - Streaming text displayed in the UI, with copy/download options
 
 ### Phase 5 — Polish & robustness
@@ -97,11 +104,12 @@ later, optional phase.
 
 ```bash
 npm install
-cp .env.local.example .env.local   # then fill in ANTHROPIC_API_KEY
+cp .env.local.example .env.local   # then fill in GEMINI_API_KEY (free key: https://aistudio.google.com/apikey)
 npm run dev
 ```
 
 ## Status
 
-Phase 0 complete — Next.js + TypeScript + Tailwind + shadcn/ui scaffolded,
-core dependencies installed, project builds and runs.
+Phase 2 complete — `/api/analyze` extracts structured job data via Gemini
+(`gemini-flash-lite-latest`, structured JSON output, bounded timeout/retries).
+Verified end-to-end with a real API key.
