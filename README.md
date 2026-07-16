@@ -17,7 +17,9 @@ API key is never exposed to the browser.
 - Tailwind CSS
 - shadcn/ui — accessible pre-built components (textarea, button, card, tabs)
 - react-hook-form + zod — form handling and validation
-- Vercel AI SDK (`ai` package) — streaming cover letter output on the client
+- Cover letter streaming is read directly off the fetch `Response` body
+  (`ReadableStream` + `TextDecoder`) — no separate streaming SDK, since
+  `@google/genai`'s own stream already does the work
 
 **Backend**
 - Next.js Route Handlers (`app/api/*/route.ts`) — no separate server
@@ -105,7 +107,7 @@ npm run dev
 
 ## Status
 
-Phase 3 complete — the analysis result renders as a card (title, company,
-location/work mode/experience/salary, summary, skills as tags), with a
-matching loading skeleton and inline error messages sourced from the API
-response.
+Phase 4 complete — `/api/cover-letter` streams a tailored cover letter from
+Gemini (name/background/tone form → streamed text via `ReadableStream`,
+rendered live with a blinking cursor, copy/download once done). Verified
+end-to-end with a real API key.
