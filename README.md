@@ -10,11 +10,6 @@ Next.js full-stack app — frontend and backend live in the same project. All
 Gemini API calls happen server-side (API routes / Server Actions) so the
 API key is never exposed to the browser.
 
-**Why Gemini:** chosen over Claude for cost — Google AI Studio issues free
-API keys (rate-limited, but sufficient for a project at this scale). If
-usage ever needs a paid tier, the provider is isolated to `lib/gemini/` and
-the two API routes, so swapping is a contained change.
-
 ## Stack
 
 **Frontend**
